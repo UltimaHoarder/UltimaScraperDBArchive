@@ -1,0 +1,57 @@
+[project]
+name = "ultima-scraper-db-archive"
+version = "0.2.0"
+description = "Archive database module hosted by the UltimaScraperDB runtime"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.14,<3.15"
+authors = [
+    { name = "UltimaHoarder", email = "1285176+UltimaHoarder@users.noreply.github.com" },
+]
+dependencies = [
+    "alembic>=1.14,<2",
+    "ultima-scraper-db>=0.5,<1",
+    "ultima-scraper-core",
+    "ultima-scraper-api>=3.0.0b4,<4",
+    "cryptography>=50,<51",
+    "psycopg[binary]>=3.3,<4",
+    "sqlmodel>=0.0.24,<1",
+]
+
+[project.scripts]
+usdb-archive-migrate = "ultima_scraper_db_archive.migration_cli:main"
+
+[tool.uv.sources]
+ultima-scraper-db = { git = "https://github.com/DATAHOARDERS/UltimaScraperDB.git", branch = "main" }
+ultima-scraper-core = { git = "https://github.com/UltimaHoarder/UltimaScraper.git", subdirectory = "src/UltimaScraperCore", branch = "main" }
+ultima-scraper-api = { git = "https://github.com/UltimaHoarder/UltimaScraperAPI.git", branch = "main" }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2,<9",
+    "pytest-asyncio>=0.23,<2",
+    "ruff>=0.12,<1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ultima_scraper_db_archive"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+exclude = [
+    "ultima_scraper_db_archive/_legacy_sqlite_models.py",
+    "ultima_scraper_db_archive/migrations",
+    "ultima_scraper_db_archive/site.py",
+]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
