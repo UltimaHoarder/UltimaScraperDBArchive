@@ -1392,6 +1392,28 @@ class ClusterInviteModel(ManagementTemplate):
     )
 
 
+class BackendPeerModel(ManagementTemplate):
+    """A backend's token for calling other backends on this database.
+
+    Only the SHA-256 of the token is kept. Revoking sets revoked_at; every
+    backend then refuses it, and that backend does not issue itself another.
+    """
+
+    __tablename__ = "backend_peers"
+    __table_args__ = (
+        Index("idx_backend_peers_token_hash", "token_hash", unique=True),
+        {"schema": "management"},
+    )
+
+    backend_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    token_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, server_default=func.now(), nullable=False
+    )
+    last_seen_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
+
+
 class SiteModel(ManagementTemplate):
     """Supported sites for order entries."""
 
