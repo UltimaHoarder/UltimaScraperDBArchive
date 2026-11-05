@@ -6,17 +6,22 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.14,<3.15"
 authors = [
-    { name = "UltimaHoarder", email = "1285176+UltimaHoarder@users.noreply.github.com" },
+    { name = "UltimaHoarder", email = "21285176+UltimaHoarder@users.noreply.github.com" },
 ]
 dependencies = [
     "alembic>=1.14,<2",
     "ultima-scraper-db>=0.5,<1",
-    "ultima-scraper-core",
-    "ultima-scraper-api>=3.0.0b4,<4",
+    "ultima-scraper-core>=0.1,<1",
+    "ultima-scraper-api>=3.0.0b5,<4",
     "cryptography>=50,<51",
     "psycopg[binary]>=3.3,<4",
     "sqlmodel>=0.0.24,<1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/UltimaHoarder/UltimaScraperDBArchive"
+Repository = "https://github.com/UltimaHoarder/UltimaScraperDBArchive"
+Issues = "https://github.com/UltimaHoarder/UltimaScraperDBArchive/issues"
 
 [project.scripts]
 usdb-archive-migrate = "ultima_scraper_db_archive.migration_cli:main"
