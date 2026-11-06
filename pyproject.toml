@@ -1,6 +1,6 @@
 [project]
 name = "ultima-scraper-db-archive"
-version = "0.2.0"
+version = "0.3.0"
 description = "Archive database module hosted by the UltimaScraperDB runtime"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
@@ -28,7 +28,7 @@ usdb-archive-migrate = "ultima_scraper_db_archive.migration_cli:main"
 
 [tool.uv.sources]
 ultima-scraper-db = { git = "https://github.com/DATAHOARDERS/UltimaScraperDB.git", branch = "main" }
-ultima-scraper-core = { git = "https://github.com/UltimaHoarder/UltimaScraper.git", subdirectory = "src/UltimaScraperCore", branch = "main" }
+ultima-scraper-core = { git = "https://github.com/UltimaHoarder/UltimaScraperCore.git", branch = "main" }
 ultima-scraper-api = { git = "https://github.com/UltimaHoarder/UltimaScraperAPI.git", branch = "main" }
 
 [dependency-groups]

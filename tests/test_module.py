@@ -53,7 +53,12 @@ def test_archive_head_owns_search_loadout_schema_and_sequence_repair() -> None:
     )
     graph = ScriptDirectory.from_config(config)
 
-    assert graph.get_heads() == ["7a2d9c4e1f80"]
+    # One head, and this repair is part of the chain leading to it; later
+    # migrations build on top of it.
+    heads = graph.get_heads()
+    assert len(heads) == 1
+    chain = {step.revision for step in graph.iterate_revisions(heads[0], "base")}
+    assert "7a2d9c4e1f80" in chain
     revision = graph.get_revision("7a2d9c4e1f80")
     assert revision is not None
     assert revision.down_revision == "f6a1c8e29b47"
