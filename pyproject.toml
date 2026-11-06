@@ -3,7 +3,7 @@ name = "ultima-scraper-db-archive"
 version = "0.2.0"
 description = "Archive database module hosted by the UltimaScraperDB runtime"
 readme = "README.md"
-license = "MIT"
+license = "AGPL-3.0-or-later"
 requires-python = ">=3.14,<3.15"
 authors = [
     { name = "UltimaHoarder", email = "21285176+UltimaHoarder@users.noreply.github.com" },
