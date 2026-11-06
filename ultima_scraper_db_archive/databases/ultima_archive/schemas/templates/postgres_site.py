@@ -1332,6 +1332,8 @@ class ClusterModel(ManagementTemplate):
     )
     # What the people using the cluster call it; shown by every WebUI.
     name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # A fixed value encrypted with USR_SECRET_KEY; see secret_key_check.py.
+    secret_key_check: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class ClusterClientModel(ManagementTemplate):

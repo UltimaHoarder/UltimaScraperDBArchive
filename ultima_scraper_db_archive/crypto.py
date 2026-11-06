@@ -78,6 +78,19 @@ class SecretCrypto:
         token = self._current.encrypt(plaintext.encode("utf-8")).decode("utf-8")
         return f"{ENC_PREFIX}{token}"
 
+    def decrypts_with_current(self, ciphertext: str) -> bool:
+        """Whether the current key, not only the previous one, opens this value."""
+        token = (
+            ciphertext[len(ENC_PREFIX) :]
+            if ciphertext.startswith(ENC_PREFIX)
+            else ciphertext
+        )
+        try:
+            self._current.decrypt(token.encode("utf-8"))
+        except Exception:
+            return False
+        return True
+
     def decrypt(self, ciphertext: str) -> str:
         token = (
             ciphertext[len(ENC_PREFIX) :]
