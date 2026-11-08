@@ -151,6 +151,7 @@ class UserModel(NativeIdMixin, SiteTemplate):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
     username: Mapped[str | None] = mapped_column(Text, nullable=True)
     balance: Mapped[float] = mapped_column(Float, server_default="0")
+    wallet_tax_percent: Mapped[float | None] = mapped_column(Float, nullable=True)
     spend: Mapped[bool] = mapped_column(Boolean, server_default="false")
     spender_type: Mapped[str | None] = mapped_column(
         String(32), server_default=None, nullable=True

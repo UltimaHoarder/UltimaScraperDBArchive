@@ -39,6 +39,7 @@ class UserModel(SiteTemplate, table=True):
     id: int = Field(primary_key=True, sa_type=BigInteger)
     username: str | None = Field(default=None, index=True)
     balance: float = Field(default=0.0)
+    wallet_tax_percent: float | None = Field(default=None)
     spend: bool = Field(default=False)
     performer: bool = Field(default=False)
     favorite: bool = Field(default=False)
