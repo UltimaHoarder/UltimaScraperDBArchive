@@ -8,7 +8,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from .databases.ultima_archive.schemas.templates.postgres_site import ManagementTemplate
 
-SITES = ("onlyfans", "fansly", "loyalfans")
+# Every site schema; b5e1c9d3a7f2 added privacy and darkfans.
+SITES = ("onlyfans", "fansly", "loyalfans", "privacy", "darkfans")
 TARGETS = {"user": "users", "post": "x_posts", "story": "x_stories", "message": "x_messages"}
 FAVOURITES_ID_SEQUENCE = Sequence("favourites_id_seq", schema="management")
 
