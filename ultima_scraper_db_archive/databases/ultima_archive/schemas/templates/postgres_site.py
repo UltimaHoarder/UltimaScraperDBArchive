@@ -24,6 +24,7 @@ from sqlalchemy import (
     Index,
     Integer,
     MetaData,
+    Sequence,
     SmallInteger,
     String,
     Text,
@@ -1946,6 +1947,100 @@ class TaskMediaEvidenceModel(ManagementTemplate):
     kind: Mapped[str] = mapped_column(String(32), primary_key=True)
     ordinal: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     payload_json: Mapped[str] = mapped_column(Text)
+
+
+# Drawn again whenever a job's media row is added or its media's download
+# state changes, so a reader can page a job's rows by it while the job runs.
+JOB_MEDIA_ACCESS_SEQ = Sequence("job_media_access_seq", schema="management")
+
+
+class JobMediaRecordModel(ManagementTemplate):
+    """Header of a job whose scraped media are kept for a hosted front end.
+
+    Its rows outlive the job until the front end acknowledges them
+    (``acked_at``) and the job is gone, or for 30 days at most.
+    """
+
+    __tablename__ = "job_media_records"
+    __table_args__ = {"schema": "management"}
+
+    job_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
+    acked_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
+
+
+class JobMediaAccessModel(ManagementTemplate):
+    """A media the job's scrape returned to its account, per content it was in.
+
+    Only media the account could fetch (a URL or DRM manifest) are kept.
+    Writers hold a per-job transaction lock while they draw ``seq``, so a
+    job's rows become visible in ``seq`` order.
+    """
+
+    __tablename__ = "job_media_access"
+    __table_args__ = (
+        Index("idx_job_media_access_job_seq", "job_id", "seq"),
+        Index("idx_job_media_access_site_media", "site", "media_id"),
+        {"schema": "management"},
+    )
+
+    job_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    site: Mapped[str] = mapped_column(String(64), primary_key=True)
+    media_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    content_type: Mapped[str] = mapped_column(String(32), primary_key=True)
+    content_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    performer_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    auth_user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    first_seen: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
+    seq: Mapped[int] = mapped_column(
+        BigInteger,
+        JOB_MEDIA_ACCESS_SEQ,
+        nullable=False,
+        server_default=JOB_MEDIA_ACCESS_SEQ.next_value(),
+    )
+
+
+class JobMediaAttributionModel(ManagementTemplate):
+    """A media this job's download first put on disk, with the bytes written."""
+
+    __tablename__ = "job_media_attribution"
+    __table_args__ = {"schema": "management"}
+
+    job_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    site: Mapped[str] = mapped_column(String(64), primary_key=True)
+    media_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    auth_user_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    bytes_on_disk: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    downloaded_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
+
+
+class JobDownloadBudgetModel(ManagementTemplate):
+    """Bytes of new media a job may still download, shared by all its tasks.
+
+    ``used_bytes`` holds what was admitted (estimated from ``media.size``) and
+    is corrected to the bytes actually written once each batch lands.
+    """
+
+    __tablename__ = "job_download_budgets"
+    __table_args__ = {"schema": "management"}
+
+    job_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    budget_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    used_bytes: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default="0"
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
 
 
 _merged_metadata_lock = Lock()
